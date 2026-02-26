@@ -767,6 +767,14 @@ class DashboardFrame(ctk.CTkFrame):
         ).pack(side="left")
         ctk.CTkButton(
             actions,
+            text="Copy Password",
+            command=self.copy_selected_password,
+            fg_color=BTN_NEUTRAL,
+            text_color=TEXT_PRIMARY,
+            hover_color=BTN_NEUTRAL_HOVER,
+        ).pack(side="left", padx=10)
+        ctk.CTkButton(
+            actions,
             text="Sign Out",
             command=self.on_logout,
             fg_color=BTN_NEUTRAL,
@@ -876,6 +884,22 @@ class DashboardFrame(ctk.CTkFrame):
             "Password Details",
             f"Website: {website}\nUsername: {username}\nPassword: {raw_password}",
         )
+
+    def copy_selected_password(self) -> None:
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showinfo("Info", "Please select a row first.")
+            return
+
+        row_id = selected[0]
+        raw_password = self.password_lookup.get(row_id, "")
+        if not raw_password:
+            messagebox.showwarning("Warning", "No password found for selected row.")
+            return
+
+        self.clipboard_clear()
+        self.clipboard_append(raw_password)
+        self.status_label.configure(text="Password copied to clipboard.")
 
     @staticmethod
     def mask_password(password: str) -> str:
